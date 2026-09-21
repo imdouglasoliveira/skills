@@ -19,7 +19,9 @@ Keep both modes in the same project.
 npm install --save-dev vite @vitejs/plugin-vue vue
 ```
 
-## 2) Create `vite.config.js`
+## 2) Create `dev/vite.config.js`
+
+The component root stays free of build config. The standalone sandbox keeps its config inside `dev/`, next to the sandbox entry point:
 
 ```js
 import { defineConfig } from 'vite';
@@ -27,7 +29,7 @@ import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
   plugins: [vue()],
-  root: './dev',
+  root: __dirname,
   server: {
     port: 3000,
     open: true,
@@ -47,9 +49,9 @@ export default defineConfig({
   "scripts": {
     "serve": "weweb serve",
     "build": "weweb build",
-    "dev": "vite --config vite.config.js",
-    "dev:build": "vite build --config vite.config.js",
-    "dev:preview": "vite preview --config vite.config.js"
+    "dev": "vite --config dev/vite.config.js",
+    "dev:build": "vite build --config dev/vite.config.js",
+    "dev:preview": "vite preview --config dev/vite.config.js"
   }
 }
 ```
@@ -64,8 +66,8 @@ project/
     index.html
     main.ts
     App.vue
+    vite.config.js
   ww-config.js
-  vite.config.js
 ```
 
 ## 5) Validation flow

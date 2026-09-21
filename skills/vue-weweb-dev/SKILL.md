@@ -97,7 +97,7 @@ const emit = defineEmits(['trigger-event']);
 - `sass` in devDependencies (WeWeb uses sass-loader)
 - ZERO private npm packages
 - NO `"type": "module"`
-- NO build config files (webpack, vite, babel, tsconfig)
+- No build config files at the component root (webpack, vite, babel, tsconfig). The standalone sandbox keeps its config in `dev/vite.config.js`.
 - NO `vue` in dependencies (already provided by WeWeb)
 
 ### WeWeb Pre-Deploy Quick Check (5 items)
@@ -116,13 +116,15 @@ Before push/deploy of a WeWeb component, validate:
 
 If the component fails to build or the dashboard shows "Failed", use the `weweb-debug` skill for full diagnostics.
 
-## Model Guidance
+## Effort guidance
 
-| Scope | Recommended model |
-|-------|-------------------|
-| Fix label, adjust spacing, rename prop | `haiku` |
-| New component, add composable, connect API, feature work | `sonnet` (default) |
-| New module with routing + state + multiple components | `opus` |
+| Scope | Effort |
+|-------|--------|
+| Fix a label, adjust spacing, rename a prop | low |
+| New component, add a composable, connect an API, feature work | medium (default) |
+| New module with routing, state and multiple components | high |
+
+Map `low`, `medium` and `high` to your tool's model tiers.
 
 ## Procedure
 

@@ -43,7 +43,7 @@ rm -rf node_modules package-lock.json && npm install && npx weweb serve
 ```
 If it fails here, the problem is dependencies — don't touch the Vue code.
 
-### RULE: Anti-Fix-Spiral (3-Commit Rule)
+### RULE: Anti-Fix-Spiral (2-Commit Rule)
 
 > If 2 fix commits don't resolve the problem, **STOP**. Revert to the last working state and reassess the hypothesis.
 > Each fix commit on top of a wrong hypothesis makes the problem worse. Comparing with a working component is more effective than sequential debugging.
@@ -63,7 +63,7 @@ Check `package.json` for these CRITICAL issues (ordered by frequency):
 | `sass` in devDependencies | Present (`^1.77.0`) | Missing = all `<style>` tags fail |
 | Private npm packages | ZERO | `@scope/private` = npm install fails silently on WeWeb |
 | `"type": "module"` | ABSENT | Present = can break build |
-| Build config files | NONE | webpack.config.js, vite.config.js, .babelrc, tsconfig.json = forbidden |
+| Build config files | NONE at the component root | webpack.config.js, vite.config.js, .babelrc, tsconfig.json at the component root are forbidden; the standalone sandbox keeps its config in `dev/vite.config.js` |
 | `vue` in dependencies | ABSENT | Already provided by WeWeb |
 | Component name | NO "weweb" or "ww" | Forbidden by the platform |
 | Build script | `"weweb build"` (no args) | `name=` or `type=` args = breaks drag & drop |
@@ -189,7 +189,7 @@ npm install && npx weweb serve
 # Increment version in package.json
 
 # 3. Push and verify dashboard
-git add . && git commit -m "fix: resolve WeWeb component build issues"
+git add <file1> <file2> && git commit -m "fix: resolve WeWeb component build issues"
 git push
 # Dashboard > Components > verify status changed from "Failed" to active
 ```
