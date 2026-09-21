@@ -110,10 +110,8 @@ git status
 # Review changes
 git diff
 
-# Stage everything (or specific files)
-git add .
-# or
-git add file1.ts file2.ts
+# Stage named files
+git add <file1> <file2>
 ```
 
 ### 2. Create the commit
