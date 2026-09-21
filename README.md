@@ -27,66 +27,61 @@ These skills work with any AI coding assistant that reads Markdown instructions.
 
 ## Installation
 
-Pick your tool and follow the steps.
+The blocks below run from the root of the cloned repository. Each one reads its destination from a variable you set first: `T` for a project directory, `OUT` for a single instructions file.
+
+Every tool with a skills directory receives the whole skill folder, with the libraries placed beside `skills/`. A skill that points at `../../libraries/<file>.md` resolves it to `<ide>/libraries/<file>.md`.
+
+| IDE | Skills directory | Libraries directory | Path source |
+|-----|------------------|---------------------|-------------|
+| Claude Code | `.claude/skills/<slug>/` | `.claude/libraries/` | docs.claude.com (skills) |
+| Codex, Antigravity, Gemini CLI | `.agents/skills/<slug>/` | `.agents/libraries/` | IDE adapter reference |
+| OpenCode | `.opencode/skills/<slug>/` | `.opencode/libraries/` | IDE adapter reference |
+| Other tools | body appended to an instructions file | appended to the same file | no documented path |
 
 ### Claude Code
 
-Copy the skill folders into your project:
-
+<!-- install:claude -->
 ```bash
-# Copy individual skills
-cp -r skills/vue-weweb-dev/ .claude/skills/vue-weweb-dev/
-cp -r skills/weweb-debug/ .claude/skills/weweb-debug/
-cp -r skills/conventional-commits/ .claude/skills/conventional-commits/
-
-# Copy libraries (referenced by skills)
-mkdir -p libraries/
-cp libraries/vue-weweb-patterns.md libraries/
-cp libraries/weweb-local-dev.md libraries/
+: "${T:?set T to your project path}"
+mkdir -p "$T/.claude/skills" "$T/.claude/libraries"
+cp -r skills/* "$T/.claude/skills/"
+cp libraries/*.md "$T/.claude/libraries/"
 ```
 
-Skills become available as `/vue-weweb-dev`, `/weweb-debug`, `/conventional-commits`.
+The skills become available as `/vue-weweb-dev`, `/weweb-debug`, `/conventional-commits`, `/ai-writing-patterns`, `/ai-code-vices` and `/ai-agent-vices`.
 
-### Codex (OpenAI)
+### Codex, Antigravity and Gemini CLI
 
-Append the skill content to your `AGENTS.md`:
-
+<!-- install:agents -->
 ```bash
-cat skills/vue-weweb-dev/SKILL.md >> AGENTS.md
-cat skills/weweb-debug/SKILL.md >> AGENTS.md
-cat skills/conventional-commits/SKILL.md >> AGENTS.md
+: "${T:?set T to your project path}"
+mkdir -p "$T/.agents/skills" "$T/.agents/libraries"
+cp -r skills/* "$T/.agents/skills/"
+cp libraries/*.md "$T/.agents/libraries/"
 ```
 
 ### OpenCode
 
-OpenCode reads `.claude/skills/` natively. Follow the Claude Code instructions above, or place files in `.opencode/skills/`.
-
-### Gemini CLI
-
-Copy skills to your Gemini instructions directory:
-
+<!-- install:opencode -->
 ```bash
-mkdir -p .gemini/skills/
-cp skills/*/SKILL.md .gemini/skills/
-cp libraries/*.md .gemini/
+: "${T:?set T to your project path}"
+mkdir -p "$T/.opencode/skills" "$T/.opencode/libraries"
+cp -r skills/* "$T/.opencode/skills/"
+cp libraries/*.md "$T/.opencode/libraries/"
 ```
 
-### Antigravity
+### Other tools
 
-Append to your instructions file:
+For a tool with no skills directory, append the skill bodies to a single instructions file. The block strips the frontmatter and replaces the `$ARGUMENTS` placeholder.
 
+<!-- install:other -->
 ```bash
-cat skills/*/SKILL.md >> .antigravity/instructions.md
-```
-
-### Kilo Code
-
-Copy skills to your rules directory:
-
-```bash
-mkdir -p .kilocode/rules/
-cp skills/*/SKILL.md .kilocode/rules/
-cp libraries/*.md .kilocode/
+: "${OUT:?set OUT to your instructions file}"
+for s in skills/*/SKILL.md; do
+  awk 'NR==1 && /^---$/ {fm=1; next} fm && /^---$/ {fm=0; next} !fm' "$s" \
+    | sed 's/\$ARGUMENTS/(describe your task here)/g' >> "$OUT"
+done
+cat libraries/*.md >> "$OUT"
 ```
 
 ---
