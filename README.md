@@ -2,7 +2,7 @@
 
 Free, open-source AI coding skills for **Vue.js/WeWeb component development** and **git workflow with Conventional Commits**.
 
-These skills work with any AI coding assistant that reads Markdown instructions. Tested with Claude Code, Codex, Gemini CLI, Antigravity, Kilo Code, and OpenCode.
+These skills work with any AI coding assistant that reads Markdown instructions. Six skills cover Vue.js/WeWeb component development, git workflow with Conventional Commits, AI writing patterns, generated code review and agent process review.
 
 ---
 
@@ -15,6 +15,9 @@ These skills work with any AI coding assistant that reads Markdown instructions.
 | [vue-weweb-dev](skills/vue-weweb-dev/SKILL.md) | Build and modify Vue.js components and WeWeb custom elements. Covers architecture patterns (feature-folders, service layer, state hierarchy), WeWeb platform rules, and the dual-script pattern. |
 | [weweb-debug](skills/weweb-debug/SKILL.md) | Diagnose and fix WeWeb components that fail to build or render. Four-phase protocol: dependencies first, then component structure, config, and build validation. Includes a common errors reference table. |
 | [conventional-commits](skills/conventional-commits/SKILL.md) | Structured git workflow following the Conventional Commits standard. Commit types, PR creation via `gh` CLI, conflict resolution, cherry-pick, bisect, worktrees, repo archaeology, and branch cleanup. |
+| [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detect and remove AI writing patterns in English and pt-BR prose. Detect mode names the pattern, the line and the excerpt without inferring authorship. |
+| [ai-code-vices](skills/ai-code-vices/SKILL.md) | Review generated source code for 13 vices, each with a symptom, a fix and a portable detector that runs on any git repository. |
+| [ai-agent-vices](skills/ai-agent-vices/SKILL.md) | Review the process an AI agent follows for 18 vices that let a wrong result pass as done, from a green check over an empty set to a fix spiral. |
 
 ### Reference Libraries
 
@@ -88,11 +91,17 @@ cat libraries/*.md >> "$OUT"
 
 ## How Skills Work
 
-Each skill is a Markdown file with optional YAML frontmatter. The frontmatter contains metadata (name, description, triggers) that tools like Claude Code use for automatic activation. Other tools ignore the frontmatter and read the Markdown body as plain instructions.
+Each skill is a Markdown file with YAML frontmatter. The keys are `name`, `description`, `argument-hint`, `use-when` and `do-not-use-for`. Only `name` and `description` are read by every tool; the rest guide activation in the tools that understand them. Tools that do not read the frontmatter treat the Markdown body as plain instructions.
 
 The `$ARGUMENTS` placeholder in each skill gets replaced with whatever you type after the skill name. For tools that don't support this, just paste your task description where `$ARGUMENTS` appears.
 
 Libraries are reference documents that skills point to. Place them alongside the skills so the relative paths resolve correctly.
+
+---
+
+## Credits
+
+The pattern taxonomy in `ai-writing-patterns` was inspired by [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). No text from that page was reproduced; the catalog is an original rewrite under the MIT license.
 
 ---
 

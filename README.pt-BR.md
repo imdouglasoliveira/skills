@@ -2,7 +2,7 @@
 
 Skills gratuitas e open-source para **desenvolvimento de componentes Vue.js/WeWeb** e **workflow git com Conventional Commits**.
 
-Funcionam com qualquer assistente de IA que leia Markdown. Testadas com Claude Code, Codex, Gemini CLI, Antigravity, Kilo Code e OpenCode.
+Funcionam com qualquer assistente de IA que leia Markdown. Seis skills cobrem desenvolvimento de componentes Vue.js/WeWeb, workflow git com Conventional Commits, padroes de escrita de IA, revisao de codigo gerado e revisao do processo do agente.
 
 ---
 
@@ -15,6 +15,9 @@ Funcionam com qualquer assistente de IA que leia Markdown. Testadas com Claude C
 | [vue-weweb-dev](skills/vue-weweb-dev/SKILL.md) | Construir e modificar componentes Vue.js e elementos custom do WeWeb. Cobre padroes de arquitetura (feature-folders, service layer, hierarquia de estado), regras da plataforma WeWeb e o dual-script pattern. |
 | [weweb-debug](skills/weweb-debug/SKILL.md) | Diagnosticar e corrigir componentes WeWeb que falham no build ou nao renderizam. Protocolo em quatro fases: dependencias primeiro, depois estrutura do componente, config e validacao de build. Inclui tabela de erros comuns. |
 | [conventional-commits](skills/conventional-commits/SKILL.md) | Workflow git estruturado seguindo o padrao Conventional Commits. Tipos de commit, criacao de PRs via `gh` CLI, resolucao de conflitos, cherry-pick, bisect, worktrees, arqueologia de repositorio e limpeza de branches. |
+| [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detectar e remover padroes de escrita de IA em prosa em ingles e pt-BR. O modo detect cita o padrao, a linha e o trecho, sem inferir autoria. |
+| [ai-code-vices](skills/ai-code-vices/SKILL.md) | Revisar codigo gerado contra 13 vicios, cada um com sintoma, correcao e um detector portatil que roda em qualquer repositorio git. |
+| [ai-agent-vices](skills/ai-agent-vices/SKILL.md) | Revisar o processo que um agente de IA segue contra 18 vicios que deixam um resultado errado passar como pronto, do gate verde sobre conjunto vazio a espiral de correcao. |
 
 ### Bibliotecas de Referencia
 
@@ -88,11 +91,17 @@ cat libraries/*.md >> "$OUT"
 
 ## Como as skills funcionam
 
-Cada skill e um arquivo Markdown com frontmatter YAML opcional. O frontmatter contem metadados (nome, descricao, gatilhos) que ferramentas como Claude Code usam para ativacao automatica. Outras ferramentas ignoram o frontmatter e leem o corpo do Markdown como instrucoes.
+Cada skill e um arquivo Markdown com frontmatter YAML. As chaves sao `name`, `description`, `argument-hint`, `use-when` e `do-not-use-for`. Apenas `name` e `description` sao lidas por todas as ferramentas; as demais orientam a ativacao nas ferramentas que as entendem. Ferramentas que nao leem o frontmatter tratam o corpo do Markdown como instrucoes.
 
 O placeholder `$ARGUMENTS` em cada skill e substituido pelo que voce digitar apos o nome da skill. Em ferramentas que nao suportam isso, basta colar a descricao da tarefa onde `$ARGUMENTS` aparece.
 
 As bibliotecas sao documentos de referencia que as skills apontam. Coloque-as junto com as skills para que os caminhos relativos funcionem.
+
+---
+
+## Creditos
+
+A taxonomia de padroes do `ai-writing-patterns` foi inspirada em [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). Nenhum texto daquela pagina foi reproduzido; o catalogo e uma reescrita original sob a licenca MIT.
 
 ---
 
