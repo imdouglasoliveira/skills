@@ -2,7 +2,7 @@
 
 Skills gratuitas e open-source para **desenvolvimento de componentes Vue.js/WeWeb** e **workflow git com Conventional Commits**.
 
-Funcionam com qualquer assistente de IA que leia Markdown. Seis skills cobrem desenvolvimento de componentes Vue.js/WeWeb, workflow git com Conventional Commits, padroes de escrita de IA, revisao de codigo gerado e revisao do processo do agente.
+Funcionam com qualquer assistente de IA que leia Markdown. Sete skills cobrem desenvolvimento de componentes Vue.js/WeWeb, workflow git com Conventional Commits, padroes de escrita de IA, revisao de codigo gerado, revisao do processo do agente e servidores MCP remotos.
 
 ---
 
@@ -18,6 +18,7 @@ Funcionam com qualquer assistente de IA que leia Markdown. Seis skills cobrem de
 | [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detectar e remover padroes de escrita de IA em prosa em ingles e pt-BR. O modo detect cita o padrao, a linha e o trecho, sem inferir autoria. |
 | [ai-code-vices](skills/ai-code-vices/SKILL.md) | Revisar codigo gerado contra 13 vicios, cada um com sintoma, correcao e um detector portatil que roda em qualquer repositorio git. |
 | [ai-agent-vices](skills/ai-agent-vices/SKILL.md) | Revisar o processo que um agente de IA segue contra 18 vicios que deixam um resultado errado passar como pronto, do gate verde sobre conjunto vazio a espiral de correcao. |
+| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Construir um servidor MCP remoto ao qual varios usuarios de um app existente se conectam, com permissao de leitura e escrita por usuario, tela de gestao de acesso e trilha de uso, em Supabase Edge Functions, proxy fechado ou Cloudflare Workers. |
 
 ### Bibliotecas de Referencia
 
@@ -51,7 +52,7 @@ cp -r skills/* "$T/.claude/skills/"
 cp libraries/*.md "$T/.claude/libraries/"
 ```
 
-As skills ficam disponiveis como `/vue-weweb-dev`, `/weweb-debug`, `/conventional-commits`, `/ai-writing-patterns`, `/ai-code-vices` e `/ai-agent-vices`.
+As skills ficam disponiveis como `/vue-weweb-dev`, `/weweb-debug`, `/conventional-commits`, `/ai-writing-patterns`, `/ai-code-vices`, `/ai-agent-vices` e `/mcp-remote-server`.
 
 ### Codex, Antigravity e Gemini CLI
 
@@ -102,6 +103,8 @@ As bibliotecas sao documentos de referencia que as skills apontam. Coloque-as ju
 ## Creditos
 
 A taxonomia de padroes do `ai-writing-patterns` foi inspirada em [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). Nenhum texto daquela pagina foi reproduzido; o catalogo e uma reescrita original sob a licenca MIT.
+
+O `mcp-remote-server` resume a [especificacao MCP](https://modelcontextprotocol.io/specification) e a documentacao da Cloudflare e do Supabase por link. Nenhum texto dessas fontes foi reproduzido.
 
 ---
 
