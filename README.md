@@ -2,7 +2,7 @@
 
 Free, open-source AI coding skills for **Vue.js/WeWeb component development** and **git workflow with Conventional Commits**.
 
-These skills work with any AI coding assistant that reads Markdown instructions. Six skills cover Vue.js/WeWeb component development, git workflow with Conventional Commits, AI writing patterns, generated code review and agent process review.
+These skills work with any AI coding assistant that reads Markdown instructions. Seven skills cover Vue.js/WeWeb component development, git workflow with Conventional Commits, AI writing patterns, generated code review, agent process review and remote MCP servers.
 
 ---
 
@@ -18,6 +18,7 @@ These skills work with any AI coding assistant that reads Markdown instructions.
 | [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detect and remove AI writing patterns in English and pt-BR prose. Detect mode names the pattern, the line and the excerpt without inferring authorship. |
 | [ai-code-vices](skills/ai-code-vices/SKILL.md) | Review generated source code for 13 vices, each with a symptom, a fix and a portable detector that runs on any git repository. |
 | [ai-agent-vices](skills/ai-agent-vices/SKILL.md) | Review the process an AI agent follows for 18 vices that let a wrong result pass as done, from a green check over an empty set to a fix spiral. |
+| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Build a remote MCP server that several users of an existing app connect to, with per-user read/write permissions, an access admin screen and a usage log, on Supabase Edge Functions, a closed proxy or Cloudflare Workers. |
 
 ### Reference Libraries
 
@@ -51,7 +52,7 @@ cp -r skills/* "$T/.claude/skills/"
 cp libraries/*.md "$T/.claude/libraries/"
 ```
 
-The skills become available as `/vue-weweb-dev`, `/weweb-debug`, `/conventional-commits`, `/ai-writing-patterns`, `/ai-code-vices` and `/ai-agent-vices`.
+The skills become available as `/vue-weweb-dev`, `/weweb-debug`, `/conventional-commits`, `/ai-writing-patterns`, `/ai-code-vices`, `/ai-agent-vices` and `/mcp-remote-server`.
 
 ### Codex, Antigravity and Gemini CLI
 
@@ -102,6 +103,8 @@ Libraries are reference documents that skills point to. Place them alongside the
 ## Credits
 
 The pattern taxonomy in `ai-writing-patterns` was inspired by [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). No text from that page was reproduced; the catalog is an original rewrite under the MIT license.
+
+`mcp-remote-server` summarizes the [MCP specification](https://modelcontextprotocol.io/specification) and the Cloudflare and Supabase documentation by link. No text from those sources was reproduced.
 
 ---
 
