@@ -263,3 +263,14 @@ Every door that can run a tool (MCP endpoint, chat bot, queue consumer, REST sid
 - No channel accepts a model-typed `confirm`, a chat "yes" or a bot message as consent. The confirmation page is the only valid "yes".
 - A chat-bot channel may deliver the summary and the link to the human; the decision still happens on the page, in the person's own session.
 - A queue consumer or scheduled job has no human present: it never runs a class A or B call unless a confirmation for the same user, tool and argument hash was already consumed for it. Otherwise it records the pending link for the person and stops.
+
+---
+
+## 15. Through an Aggregator Dispatcher
+
+When relayed tools are called through a dispatcher (`relay_tool_call`, `aggregator-discovery.md`, section 5), the gate binds to the **concrete tool**, never to the dispatcher.
+- `tool` in the pending-action record is the concrete published name; `args_hash` is computed over the concrete tool's `arguments` only. `tool_ref`, `confirmation_id` and any dispatcher field stay out of the hash.
+- `confirmation_id` is a top-level dispatcher field, stripped before the relay; it never reaches the origin and never enters the tool signature.
+- The pending text tells the model to call the dispatcher again with the same `tool_ref`, the same `arguments` and the `confirmation_id`, because the concrete tool is not in its list.
+- A confirmation created by a direct call is valid through the dispatcher and the reverse, when user, connection, concrete tool and argument hash match.
+- Tests: a sensitive tool reached through the dispatcher returns the pending link and never relays on the first call; a confirmation for tool X does not run tool Y through the dispatcher with the same arguments.

@@ -18,7 +18,7 @@ Funcionam com qualquer assistente de IA que leia Markdown. Sete skills cobrem de
 | [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detectar e remover 47 padrões de escrita de IA em prosa em inglês e pt-BR, e corrigir a escrita (acentuação, crase, concordância, regência, vírgula, hífen, homófonos; erros comuns do inglês). O modo detect cita o padrão, a linha e o trecho, sem inferir autoria; o modo correct lista cada correção com linha, regra, nível e motivo, sem mexer em código, citação, dado ou nome próprio. |
 | [ai-code-vices](skills/ai-code-vices/SKILL.md) | Revisar codigo gerado contra 13 vicios, cada um com sintoma, correcao e um detector portatil que roda em qualquer repositorio git. |
 | [ai-agent-vices](skills/ai-agent-vices/SKILL.md) | Revisar o processo que um agente de IA segue contra 18 vicios que deixam um resultado errado passar como pronto, do gate verde sobre conjunto vazio a espiral de correcao. |
-| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Construir um servidor MCP remoto ao qual varios usuarios de um app existente se conectam, com permissao de leitura e escrita por usuario, tela de gestao de acesso e trilha de uso, em Supabase Edge Functions, proxy fechado ou Cloudflare Workers. Cobre a confirmação obrigatória de ação sensível (link, prévia e código do autenticador, uso único), o MCP agregador que republica as ferramentas de outro MCP com a credencial da própria pessoa, a expiração de conexão sem uso e a publicação. |
+| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Construir um servidor MCP remoto ao qual varios usuarios de um app existente se conectam, com permissao de leitura e escrita por usuario, tela de gestao de acesso e trilha de uso, em Supabase Edge Functions, proxy fechado ou Cloudflare Workers. Cobre a confirmação obrigatória de ação sensível (link, prévia e código do autenticador, uso único), o MCP agregador que republica as ferramentas de outro MCP com a credencial da própria pessoa (catálogo inteiro, subconjunto por perfil ou busca de ferramenta com despachante, sempre pelo mesmo pipeline de autorização), a expiração de conexão sem uso e a publicação. |
 
 ### Bibliotecas de Referencia
 
@@ -115,6 +115,8 @@ A versão 1.1.0 do `ai-writing-patterns` tomou ideias de cinco skills MIT, reesc
 O modo de correção e os sinais em pt-BR são próprios desta skill.
 
 O `mcp-remote-server` resume a [especificacao MCP](https://modelcontextprotocol.io/specification) e a documentacao da Cloudflare e do Supabase por link. Nenhum texto dessas fontes foi reproduzido.
+
+A versão 1.2.0 do `mcp-remote-server` (modos de exposição do agregador, busca de ferramenta, despachante, perfis, camadas de cache, disjuntor por origem e registro de nomes) tomou ideias do [decocms/studio](https://github.com/decocms/studio) (MCPs virtuais, busca e chamada de ferramentas, isolamento por origem) e do [mcp-use/mcp-use](https://github.com/mcp-use/mcp-use) (proxy que federa ferramentas, transporte separado da política). Nenhum código nem texto deles foi copiado, e nenhum dos dois é dependência.
 
 ---
 
