@@ -82,6 +82,27 @@ connect replay and downgrade-during-exchange, secrets scan in error translation,
 SQL rehearsal in a rolled-back transaction, and a comparison of the existing static guards' red set before
 and after the change.
 
+When an exposure mode other than `full` or a profile is added (`aggregator-discovery.md`,
+`aggregator-composition.md`), also prove:
+
+| Case | Expected |
+|---|---|
+| No new configuration | `tools/list` equals the `full` snapshot taken before the change |
+| Tool the person may not run, searched by its exact name | absent from results |
+| Forbidden, unknown, malformed or other-origin `tool_ref` sent straight to the dispatcher | same `unknown` text, zero origin calls |
+| Ceiling lowered or token revoked between search and call | call refused with the current state |
+| Destructive tool found by search | release and confirmation still required |
+| Sensitive tool through the dispatcher | pending link bound to the concrete tool and argument hash; confirmation for tool X never runs tool Y |
+| Person A's `tool_ref` or warm composed cache used by person B | not revealed, not executed |
+| Two origins with the same tool name | each call reaches its own origin |
+| Origin down | host tools still listed and working; 401/403 never open the breaker |
+| Search truncated | `truncated`, `total` and `notice` present |
+| One call of each outcome through the dispatcher | exactly one log row, as the concrete tool, with `via` |
+| Ranking fixture | each scripted query returns the expected tool first |
+
+Run the same task list in each mode and record tools announced, schema bytes, calls per task, latency
+and right-tool rate before choosing a mode (`aggregator-discovery.md`, section 8).
+
 ---
 
 ## 9. Guard Proofs Through the Real Route

@@ -114,6 +114,8 @@ Tools republished from another MCP are not defined with `defineTool()`. Publish 
 annotations plus the sticky per-tenant record; the parity test in section 1 covers static tools and a
 separate test covers the relayed ones (see `aggregator-relay.md`, sections 3 and 4). A relayed
 destructive tool needs both the admin release and the confirmation gate of section 5 before the relay.
+How many relayed tools appear up front (all, a profile's subset, or none plus a search tool) is the
+exposure mode of `aggregator-discovery.md`; it changes the list, never the checks on the call.
 
 ---
 
@@ -167,6 +169,7 @@ Some chat clients expect tools named `search` and `fetch`. When you expose them:
 - `search` returns `{results: [{id, title, url}]}`; ids carry a type prefix, and `fetch` takes that id.
 - `search` shows a small fixed number per type and always warns when it cut (N-03). Counts come from list tools; the guide says "never count with search".
 - Visibility follows the same scopes as the specific tools (see `aggregator-relay.md`, section 5, when an origin domain exists).
+- These are for **data**. An aggregator's search over its **tool catalog** is a different tool with a different name (`relay_tools_search`), and its dispatcher `relay_tool_call` is annotated as the worst case (`readOnlyHint: false`, `destructiveHint: true`) because the concrete tool decides the risk (see `aggregator-discovery.md`, sections 3 to 5).
 
 ---
 

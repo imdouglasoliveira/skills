@@ -108,3 +108,13 @@ screen.
 ## 11. Per-Call Access Re-Check
 
 Re-check "may this person still use the server" (allowlist and blocklist, see `access-screens.md`, section 9) on every call, for OAuth and PAT alike, so a change made by any path (admin screen, script, direct database edit) takes effect on the next call. It is a separate step before the effective-scope calculation, and a read failure denies.
+
+---
+
+## 12. Exposure Is Not Permission
+
+An aggregator may show fewer relayed tools than the person is allowed (a profile, or the `discovery` mode of `aggregator-discovery.md`). The exposed set is always `allowed by identity ∩ allowed by ceiling ∩ offered by the origin ∩ selected by the profile` (N-22).
+- Compute "allowed" with the same function in `tools/list`, in the tool search and in the dispatcher. A second, simpler copy drifts and becomes a bypass.
+- The profile only removes. A tool refused by token scope or ceiling stays refused in every profile and every mode.
+- Mode and profile come from server-side configuration bound to the connection, role or tenant, never from tool arguments or headers the model controls.
+- A search result or a `tool_ref` held by the model is not proof of access: the call re-reads scope, classification and release (N-24).

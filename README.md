@@ -18,7 +18,7 @@ These skills work with any AI coding assistant that reads Markdown instructions.
 | [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detect and remove 47 AI writing patterns in English and pt-BR prose, and correct the writing itself (pt-BR accents, crase, agreement, regência, commas, hyphens, homophones; common English errors). Detect mode names the pattern, the line and the excerpt without inferring authorship; correct mode lists each fix with line, rule, tier and reason, and leaves code, quotes, data and proper nouns alone. |
 | [ai-code-vices](skills/ai-code-vices/SKILL.md) | Review generated source code for 13 vices, each with a symptom, a fix and a portable detector that runs on any git repository. |
 | [ai-agent-vices](skills/ai-agent-vices/SKILL.md) | Review the process an AI agent follows for 18 vices that let a wrong result pass as done, from a green check over an empty set to a fix spiral. |
-| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Build a remote MCP server that several users of an existing app connect to, with per-user read/write permissions, an access admin screen and a usage log, on Supabase Edge Functions, a closed proxy or Cloudflare Workers. Covers mandatory human confirmation of sensitive tools (link, preview and authenticator code, single use), an aggregator MCP that republishes another MCP's tools with the person's own credential, idle connection expiry and deployment. |
+| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Build a remote MCP server that several users of an existing app connect to, with per-user read/write permissions, an access admin screen and a usage log, on Supabase Edge Functions, a closed proxy or Cloudflare Workers. Covers mandatory human confirmation of sensitive tools (link, preview and authenticator code, single use), an aggregator MCP that republishes another MCP's tools with the person's own credential (full catalog, per-profile subset, or tool search plus dispatcher, all through one authorization pipeline), idle connection expiry and deployment. |
 
 ### Reference Libraries
 
@@ -115,6 +115,8 @@ Version 1.1.0 of `ai-writing-patterns` took ideas from five MIT-licensed skills,
 The correction mode and the pt-BR signals are original to this skill.
 
 `mcp-remote-server` summarizes the [MCP specification](https://modelcontextprotocol.io/specification) and the Cloudflare and Supabase documentation by link. No text from those sources was reproduced.
+
+Version 1.2.0 of `mcp-remote-server` (aggregator exposure modes, tool search, dispatcher, profiles, cache layers, per-origin circuit breaker and naming registry) took ideas from [decocms/studio](https://github.com/decocms/studio) (virtual MCPs, tool search and call, per-origin isolation) and [mcp-use/mcp-use](https://github.com/mcp-use/mcp-use) (a proxy that federates tools, transport kept apart from policy). No code or text from them was copied, and neither is a dependency.
 
 ---
 

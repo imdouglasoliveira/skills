@@ -4,6 +4,8 @@ This reference covers a **host MCP** that reads an **origin MCP**'s `tools/list`
 
 The point of the pattern: a tool added to the origin appears in the host with no host code, review or deploy. The origin stays the only owner of schema, description, permission rule and tests.
 
+This file describes the `full` exposure mode, the default: every allowed relayed tool appears in `tools/list`. Showing a subset per profile or exposing the catalog on demand through a search tool and a dispatcher is in `aggregator-discovery.md`; profiles, cache layers, circuit breaker, naming registry and several origins are in `aggregator-composition.md`. Both build on the rules below and never replace them.
+
 ---
 
 ## 1. When to use it, and when not to
@@ -61,6 +63,8 @@ What the person must do to start using it: a **second authorization** at the ori
 | Size | a full origin manifest can reach tens of KB (thousands of tokens). Publish it only to people who hold the domain **and** have connected |
 
 Order of skip reasons: `format` first only when there is no name to evaluate; then `name`, `ref`, `collision`, `duplicate`.
+
+Keep a registry from published name to `(origin, original name, signature)` while building the catalog, and resolve calls through it rather than by splitting the published name (`aggregator-composition.md`, section 4).
 
 ---
 
@@ -182,6 +186,8 @@ A single pure function resolves the `tools/call` name; the handler for dynamic t
 7. Sensitive call (class A or B; a destructive relayed tool is at least B): the confirmation gate of `confirmation.md` returns the pending link instead of relaying. Add `confirmation_id` to the published schema after computing the signature, and strip it from the arguments before the relay.
 
 No step before the last calls the origin tool. Refusals 1 and 2 cause zero network calls; 5, 6 and 7 cause zero `tools/call`.
+
+The dispatcher of the `discovery` mode (`relay_tool_call`) resolves its `tool_ref` to the published name and enters this resolver at step 2. It adds no step of its own besides the profile check and has no other way to reach the origin (`aggregator-discovery.md`, section 5).
 
 ### 8.2 Timeouts
 
