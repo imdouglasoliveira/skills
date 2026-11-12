@@ -30,7 +30,7 @@ The proxy must enforce strict header sanitization:
 ## 4. Deno Deploy Specific Caveats
 
 If deploying the proxy onto Deno Deploy:
-- Be mindful that automated GitHub integration triggers a build on every push, quickly exhausting hourly deploy limits during heavy development.
+- Be mindful that automated repository integration triggers a build on every push, quickly exhausting hourly deploy limits during heavy development.
 - A misconfigured deployment script can inadvertently publish the entire repository as a static site. Implement a periodic leak probe requesting known sensitive source filenames to ensure static file serving is disabled.
 
 ---
