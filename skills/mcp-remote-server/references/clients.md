@@ -100,3 +100,12 @@ Configured in `.antigravity/mcp.json`:
   }
 }
 ```
+
+---
+
+## 4. Rollout and Tool-List Refresh
+
+- Some chat clients freeze the tool list at connect time. After each deploy that changes the catalog, refresh the connector's tools in each client; bump `serverInfo.version` so the change is visible.
+- After publishing a server that adds `confirmation_id` and the pending result, refresh the tool list in each client; until then, matching by argument hash keeps old clients working. "Always allow" settings do not bypass the confirmation gate.
+- Some CLI clients register at the host root, so they cannot connect through a raw function URL that has a path prefix: put the custom-domain proxy (`runtime-proxy.md`) in front.
+- Record per client how it refreshes tools and whether it needs the proxy.

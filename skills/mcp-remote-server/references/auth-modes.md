@@ -63,6 +63,12 @@ For native and CLI clients using loopback addresses (such as `http://127.0.0.1` 
 - Every PAT must have a mandatory expiration period between 1 and 365 days.
 - The raw token string is shown exactly once upon creation and only the hash is preserved in storage.
 - It is recommended to issue at most one PAT per client or device integration.
+- **Visible prefix**: tokens start with a fixed prefix, so secret scanners find leaks and a wrong prefix is rejected before any database access.
+- **Mint rules**: only an interactive OAuth session can mint a PAT (a PAT cannot create children that outlive its own revocation). Requested scopes must be inside the user's current ceiling and inside the catalog.
+- **Audit**: the creation audit row is written in the same transaction or batch, without token or hash.
+- **Last used**: record `last_used_at` (throttled, see `usage-log.md`, section 3) and show it in the list; the list never shows the token.
+- **Optional narrowing** (project or tenant list): a nullable column where null keeps the normal behavior and an unreadable value restricts to nothing (fail closed). Clip at request time, so an edited row cannot widen it.
+- Accept PATs through the same route and audience as OAuth tokens. Closing proof: create, list (last used, no token), revoke, then 401.
 
 ---
 
@@ -70,5 +76,35 @@ For native and CLI clients using loopback addresses (such as `http://127.0.0.1` 
 
 - When responding to unauthenticated requests, send HTTP 401 with:
   `WWW-Authenticate: Bearer resource_metadata="<url>", scope="<scopes>"`
-- When scopes are insufficient, send HTTP 403 with `error="insufficient_scope"`.
+- When scopes are insufficient for the whole request or endpoint, send HTTP 403 with `error="insufficient_scope"`. A single tool refused inside `tools/call` is a tool result with `isError: true`, not a 403 (see `tool-contract.md`, section 6).
 - Warning: An HTTP 401 that advertises OAuth metadata may prompt a PAT client to mistakenly attempt an OAuth discovery handshake. See `clients.md` for client-specific headers and workarounds.
+
+---
+
+## 10. Idle Connection Expiry (recommended)
+
+A refresh token keeps a forgotten connection alive forever: a client left plugged in for months still holds a valid grant. Expire connections that nobody uses. This is a recommendation, not a default; the owner picks the window (7 days is a good start: a weekly user never notices, an abandoned client loses access).
+
+| Decision | Recommendation |
+|---|---|
+| Liveness signal | `greatest(coalesce(max(last_used_at) over the connection's tokens, created_at), updated_at)`. `last_used_at` is written on `tools/call` (a throttled write is enough); `updated_at` covers a re-authorization that reuses the old connection row. Using only `created_at` or only one token revokes connections in active use. Add both columns if your schema lacks them. |
+| Window | A parameter (`p_days`, default 7), not a constant in the query. |
+| Effect | Same as the user's own "Remove": set `revoked_at` on the connection and on every live token. Refresh must fail after that. |
+| Stored delegated session | Delete it only when the user is left with no active connection; another live connection may still use it. |
+| Runner | A daily job (`pg_cron`, Worker cron trigger) calling a function granted only to the service role. Schedule it idempotently (unschedule then schedule by name). |
+| Business data | Untouched. The job revokes access only; say so in one line in the migration (useful for privacy records). |
+| User-facing | Show "last used" per connection in the connections screen (`access-screens.md`, section 3) and state the rule in the connect guide ("connections unused for N days are removed; reconnect to continue"). |
+| Return | The job returns the count of revoked connections; log it. |
+
+Tests: a connection used yesterday survives; one idle for N+1 days is revoked with all its tokens; a re-authorized old connection (fresh `updated_at`) survives; the stored session survives while another connection is active; mutating the liveness expression (drop `updated_at` or `max`) turns a test red.
+
+Rollback: unschedule the job and drop the function. A revoked connection only comes back through a new authorization.
+
+---
+
+## 11. Second Authorization at an Origin
+
+An aggregator is an OAuth client of the origin system, separate from the auth mode the host serves. Use a
+confidential client, PKCE S256, an opaque single-use `state` stored hashed, a return page inside the host
+app (not a function URL), and a step-up for people who have a factor. Details and token rotation rules:
+`aggregator-relay.md`, section 6.

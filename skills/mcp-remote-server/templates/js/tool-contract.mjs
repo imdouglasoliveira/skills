@@ -6,6 +6,7 @@
  *   - Use toListEntry() to build the tools/list response.
  *   - Use scopeMap() to derive the scope map from your definitions.
  *   - Use cutNotice() when paginating the tool list.
+ *   - Declare sensitivity on every write tool (see references/confirmation.md).
  *
  * No external imports, no I/O. All validation is synchronous.
  */
@@ -20,6 +21,8 @@ const TOOL_NAME_RE = /^[a-z][a-z0-9]*(_[a-z0-9]+)+$/;
  *   scope: string|null,
  *   readOnly: boolean,
  *   destructive: boolean,
+ *   sensitivity?: "A"|"B"|"C"|"none",
+ *   preview?: Function,
  *   input: Record<string, object>,
  *   required: string[],
  *   output: object,
@@ -56,14 +59,15 @@ export function defineTool(def) {
       throw new Error(`defineTool: "${def.name}" required cites unknown property "${req}"`);
     }
   }
-  // Destructive tools must have a literal "confirm" field in input and required
-  if (def.destructive) {
-    if (!Object.prototype.hasOwnProperty.call(def.input || {}, "confirm")) {
-      throw new Error(`defineTool: destructive "${def.name}" must have a "confirm" property in input`);
-    }
-    if (!(def.required || []).includes("confirm")) {
-      throw new Error(`defineTool: destructive "${def.name}" must include "confirm" in required`);
-    }
+  // Sensitive tools are gated by the server (see references/confirmation.md); a "confirm" input is forbidden.
+  if (Object.prototype.hasOwnProperty.call(def.input || {}, "confirm")) {
+    throw new Error(`defineTool: "${def.name}" must not declare a "confirm" input; the server gates sensitive tools`);
+  }
+  if (def.readOnly && def.sensitivity && def.sensitivity !== "none") {
+    throw new Error(`defineTool: read-only "${def.name}" cannot be sensitive`);
+  }
+  if (!def.readOnly && !["A", "B", "C"].includes(String(def.sensitivity))) {
+    throw new Error(`defineTool: write tool "${def.name}" must declare sensitivity A, B or C`);
   }
   return Object.freeze(def);
 }
@@ -91,20 +95,31 @@ export function scopeMap(tools) {
  * @returns {object}
  */
 export function toListEntry(tool) {
+  const gated = isGated(tool);
+  const properties = gated
+    ? {
+        ...tool.input,
+        confirmation_id: {
+          type: "string",
+          format: "uuid",
+          description: "Optional. Id from the confirmation link, after the user confirmed.",
+        },
+      }
+    : tool.input;
   return {
     name: tool.name,
     title: tool.title,
     description: tool.description,
     inputSchema: {
       type: "object",
-      properties: tool.input,
+      properties,
       required: tool.required,
       additionalProperties: false,
     },
-    outputSchema: tool.output,
+    outputSchema: gated ? { anyOf: [tool.output, PENDING_OUTPUT] } : tool.output,
     annotations: {
       readOnlyHint: tool.readOnly,
-      destructiveHint: tool.destructive,
+      destructiveHint: gated || tool.destructive,
       openWorldHint: false,
     },
   };
@@ -126,4 +141,22 @@ export function cutNotice(returned, total, fullListTool) {
     cut_at: returned,
     total,
   };
+}
+
+// Output of the first call of a sensitive tool (references/confirmation.md, section 8).
+export const PENDING_OUTPUT = Object.freeze({
+  type: "object",
+  properties: {
+    status: { type: "string", enum: ["confirmation_pending"] },
+    confirmation_id: { type: "string", format: "uuid" },
+    link: { type: "string" },
+    expires_at: { type: "string" },
+    summary: { type: "string" },
+  },
+  required: ["status", "confirmation_id", "link", "expires_at", "summary"],
+});
+
+// Classes A and B go through the confirmation gate; C and reads run directly.
+export function isGated(tool) {
+  return tool.sensitivity === "A" || tool.sensitivity === "B";
 }

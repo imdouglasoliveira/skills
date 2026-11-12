@@ -33,3 +33,34 @@ Using the official TypeScript SDK v2 (`@modelcontextprotocol/server`) with `crea
 ## 4. Two Different Sessions
 
 The concept of a protocol "session" in legacy specs is not the same as the user session stored in the database. A protocol session represents transport-level continuity between client and edge worker, whereas a user session tracks authenticated identity, tenant boundaries, and access ceiling rows in persistence.
+
+---
+
+## 5. Request Deadline
+
+Compute one deadline when the request arrives and pass an abort signal derived from it to every database and upstream call. When it expires, return a retryable tool error tagged `timeout` (with `(ref N)`), not a platform 5xx. Keep the deadline below the client's wait and the platform limit. Give `tools/list` its own budget, and cache whatever is dynamic in it.
+
+---
+
+## 6. Conformance Details
+
+- Accept a request without the protocol-version header. Echo the version the client **asked for**, never simply the newest you support. Read the version from the header, then `_meta`, then params; a version only in params that you do not support falls back to the legacy era.
+- Wrap every result in one function that adds the era's metadata (`resultType`, `ttlMs`, `cacheScope`). A missing field can make a client connect and then reject `tools/list` entirely.
+- CORS exposes `WWW-Authenticate` and `Retry-After`, and allows the `mcp-protocol-version` and `mcp-session-id` request headers.
+- Notifications get 202 with no body. Answer `ping`.
+- Cache the protected-resource metadata document briefly (minutes).
+- Bump `serverInfo.version` whenever the catalog changes; announce `listChanged` only if you send the notification.
+
+---
+
+## 7. Server Prompts (recommended)
+
+Ship `prompts` for tasks where models fail repeatedly (turning free text into records, analyzing a report, configuring something). A prompt takes few arguments and returns one message with numbered rules, each tied to a past failure; it is the script that stops the model filling gaps with invented values.
+
+Advertise `capabilities.prompts` only when `prompts/list` and `prompts/get` both answer: announcing without answering breaks the client on its first call.
+
+---
+
+## 8. Elicitation and Confirmation
+
+Stateless JSON-only servers cannot use `elicitation`, and some clients decline it automatically. Human confirmation of sensitive calls is done out of band (see `confirmation.md`, section 1).

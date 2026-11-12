@@ -58,7 +58,7 @@ export function ceilingScopes(rows, domains, mode) {
 
 /**
  * Compute the effective scopes as the intersection of token scopes and the current ceiling.
- * Write implies read: if ceiling grants "x:write", a token scope of "x:read" is also satisfied.
+ * Write implies read on the ceiling side only; the token must carry the exact scope a tool uses.
  *
  * @param {string[]} tokenScopes  Scopes requested/granted in the token.
  * @param {string[]} ceiling      Output of ceilingScopes().
