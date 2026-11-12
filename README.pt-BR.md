@@ -15,10 +15,10 @@ Funcionam com qualquer assistente de IA que leia Markdown. Sete skills cobrem de
 | [vue-weweb-dev](skills/vue-weweb-dev/SKILL.md) | Construir e modificar componentes Vue.js e elementos custom do WeWeb. Cobre padroes de arquitetura (feature-folders, service layer, hierarquia de estado), regras da plataforma WeWeb e o dual-script pattern. |
 | [weweb-debug](skills/weweb-debug/SKILL.md) | Diagnosticar e corrigir componentes WeWeb que falham no build ou nao renderizam. Protocolo em quatro fases: dependencias primeiro, depois estrutura do componente, config e validacao de build. Inclui tabela de erros comuns. |
 | [conventional-commits](skills/conventional-commits/SKILL.md) | Workflow git estruturado seguindo o padrao Conventional Commits. Tipos de commit, criacao de PRs via `gh` CLI, resolucao de conflitos, cherry-pick, bisect, worktrees, arqueologia de repositorio e limpeza de branches. |
-| [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detectar e remover padroes de escrita de IA em prosa em ingles e pt-BR. O modo detect cita o padrao, a linha e o trecho, sem inferir autoria. |
+| [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detectar e remover 47 padrões de escrita de IA em prosa em inglês e pt-BR, e corrigir a escrita (acentuação, crase, concordância, regência, vírgula, hífen, homófonos; erros comuns do inglês). O modo detect cita o padrão, a linha e o trecho, sem inferir autoria; o modo correct lista cada correção com linha, regra, nível e motivo, sem mexer em código, citação, dado ou nome próprio. |
 | [ai-code-vices](skills/ai-code-vices/SKILL.md) | Revisar codigo gerado contra 13 vicios, cada um com sintoma, correcao e um detector portatil que roda em qualquer repositorio git. |
 | [ai-agent-vices](skills/ai-agent-vices/SKILL.md) | Revisar o processo que um agente de IA segue contra 18 vicios que deixam um resultado errado passar como pronto, do gate verde sobre conjunto vazio a espiral de correcao. |
-| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Construir um servidor MCP remoto ao qual varios usuarios de um app existente se conectam, com permissao de leitura e escrita por usuario, tela de gestao de acesso e trilha de uso, em Supabase Edge Functions, proxy fechado ou Cloudflare Workers. |
+| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Construir um servidor MCP remoto ao qual varios usuarios de um app existente se conectam, com permissao de leitura e escrita por usuario, tela de gestao de acesso e trilha de uso, em Supabase Edge Functions, proxy fechado ou Cloudflare Workers. Cobre a confirmação obrigatória de ação sensível (link, prévia e código do autenticador, uso único), o MCP agregador que republica as ferramentas de outro MCP com a credencial da própria pessoa, a expiração de conexão sem uso e a publicação. |
 
 ### Bibliotecas de Referencia
 
@@ -103,6 +103,16 @@ As bibliotecas sao documentos de referencia que as skills apontam. Coloque-as ju
 ## Creditos
 
 A taxonomia de padroes do `ai-writing-patterns` foi inspirada em [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). Nenhum texto daquela pagina foi reproduzido; o catalogo e uma reescrita original sob a licenca MIT.
+
+A versão 1.1.0 do `ai-writing-patterns` tomou ideias de cinco skills MIT, reescritas com palavras próprias:
+
+- [ItsssssJack/SlopMonster](https://github.com/ItsssssJack/SlopMonster): leitor e objetivo antes da edição, caso que precisa continuar limpo para cada regra, marcador no lugar de prova inventada.
+- [blader/humanizer](https://github.com/blader/humanizer): texto revisado nunca é instrução, leitura integral do arquivo, amostra de voz acima das regras, padrões de abertura que anuncia, fecho que ecoa e título repetido.
+- [harshaneel/humanize](https://github.com/harshaneel/humanize): calibração para texto curto, técnico ou de não nativo, e contagem dos acertos restantes em vez de lembrança. O objetivo de enganar detector não foi adotado.
+- [lguz/humanize-writing-skill](https://github.com/lguz/humanize-writing-skill): conferir que a correção não vira o próximo clichê.
+- [haidrrrry/humanize-ai-writing](https://github.com/haidrrrry/humanize-ai-writing): marcação de provedor e links rastreados, e a regra de não corrigir demais.
+
+O modo de correção e os sinais em pt-BR são próprios desta skill.
 
 O `mcp-remote-server` resume a [especificacao MCP](https://modelcontextprotocol.io/specification) e a documentacao da Cloudflare e do Supabase por link. Nenhum texto dessas fontes foi reproduzido.
 

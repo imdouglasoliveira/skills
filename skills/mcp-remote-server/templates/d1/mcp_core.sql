@@ -156,3 +156,33 @@ create index if not exists mcp_request_log_created_at_idx
 
 create index if not exists mcp_request_log_connection_idx
   on mcp_request_log (connection_id, created_at desc);
+
+-- ── confirmation (N-04, optional block; see references/confirmation.md) ──────
+
+create table if not exists mcp_confirmations (
+  id             text primary key,
+  tenant_id      text not null,
+  user_id        text not null,
+  connection_id  text not null,
+  tool           text not null,
+  class          text not null check (class in ('A', 'B')),
+  args_hash      text not null,
+  preview        text,                   -- JSON
+  preview_hash   text not null,
+  status         text not null default 'pending'
+                 check (status in ('pending', 'confirmed', 'refused', 'consumed')),
+  created_at     text not null default (datetime('now')),
+  expires_at     text not null,
+  decided_at     text,
+  decided_aal    text,
+  consume_until  text,
+  consumed_at    text
+);
+
+create index if not exists mcp_confirmations_lookup_idx
+  on mcp_confirmations (user_id, connection_id, tool, args_hash, status);
+
+-- SQLite has no add-column-if-not-exists: run this line once.
+alter table mcp_request_log add column confirmation_id text;
+
+-- Consume runs in the Worker (statement in references/confirmation.md, section 3); read and decide live in the host app.
