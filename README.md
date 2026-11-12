@@ -15,10 +15,10 @@ These skills work with any AI coding assistant that reads Markdown instructions.
 | [vue-weweb-dev](skills/vue-weweb-dev/SKILL.md) | Build and modify Vue.js components and WeWeb custom elements. Covers architecture patterns (feature-folders, service layer, state hierarchy), WeWeb platform rules, and the dual-script pattern. |
 | [weweb-debug](skills/weweb-debug/SKILL.md) | Diagnose and fix WeWeb components that fail to build or render. Four-phase protocol: dependencies first, then component structure, config, and build validation. Includes a common errors reference table. |
 | [conventional-commits](skills/conventional-commits/SKILL.md) | Structured git workflow following the Conventional Commits standard. Commit types, PR creation via `gh` CLI, conflict resolution, cherry-pick, bisect, worktrees, repo archaeology, and branch cleanup. |
-| [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detect and remove AI writing patterns in English and pt-BR prose. Detect mode names the pattern, the line and the excerpt without inferring authorship. |
+| [ai-writing-patterns](skills/ai-writing-patterns/SKILL.md) | Detect and remove 47 AI writing patterns in English and pt-BR prose, and correct the writing itself (pt-BR accents, crase, agreement, regência, commas, hyphens, homophones; common English errors). Detect mode names the pattern, the line and the excerpt without inferring authorship; correct mode lists each fix with line, rule, tier and reason, and leaves code, quotes, data and proper nouns alone. |
 | [ai-code-vices](skills/ai-code-vices/SKILL.md) | Review generated source code for 13 vices, each with a symptom, a fix and a portable detector that runs on any git repository. |
 | [ai-agent-vices](skills/ai-agent-vices/SKILL.md) | Review the process an AI agent follows for 18 vices that let a wrong result pass as done, from a green check over an empty set to a fix spiral. |
-| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Build a remote MCP server that several users of an existing app connect to, with per-user read/write permissions, an access admin screen and a usage log, on Supabase Edge Functions, a closed proxy or Cloudflare Workers. |
+| [mcp-remote-server](skills/mcp-remote-server/SKILL.md) | Build a remote MCP server that several users of an existing app connect to, with per-user read/write permissions, an access admin screen and a usage log, on Supabase Edge Functions, a closed proxy or Cloudflare Workers. Covers mandatory human confirmation of sensitive tools (link, preview and authenticator code, single use), an aggregator MCP that republishes another MCP's tools with the person's own credential, idle connection expiry and deployment. |
 
 ### Reference Libraries
 
@@ -103,6 +103,16 @@ Libraries are reference documents that skills point to. Place them alongside the
 ## Credits
 
 The pattern taxonomy in `ai-writing-patterns` was inspired by [Wikipedia:Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing). No text from that page was reproduced; the catalog is an original rewrite under the MIT license.
+
+Version 1.1.0 of `ai-writing-patterns` took ideas from five MIT-licensed skills, restated in our own words:
+
+- [ItsssssJack/SlopMonster](https://github.com/ItsssssJack/SlopMonster): reader and purpose before editing, a must-stay-clean case for every rule, placeholders instead of invented proof.
+- [blader/humanizer](https://github.com/blader/humanizer): reviewed text is never instructions, full-file reads, a voice sample outranks the rules, and the announcement-opener, echo-closer and heading-echo patterns.
+- [harshaneel/humanize](https://github.com/harshaneel/humanize): calibration for short, technical and non-native text, and counting remaining hits instead of recalling them. Its detector-evasion goal was not adopted.
+- [lguz/humanize-writing-skill](https://github.com/lguz/humanize-writing-skill): checking that a fix does not become the next stock phrase.
+- [haidrrrry/humanize-ai-writing](https://github.com/haidrrrry/humanize-ai-writing): provider markup and tracked links, and the do-not-overcorrect rule.
+
+The correction mode and the pt-BR signals are original to this skill.
 
 `mcp-remote-server` summarizes the [MCP specification](https://modelcontextprotocol.io/specification) and the Cloudflare and Supabase documentation by link. No text from those sources was reproduced.
 

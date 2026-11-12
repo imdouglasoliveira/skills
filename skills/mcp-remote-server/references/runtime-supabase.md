@@ -78,7 +78,18 @@ Separate pure business logic from modules with network and database I/O so that 
 
 ---
 
-## 10. Does not apply here
+## 10. Deploy Order Compatibility
+
+Make every deploy order safe: the function must work both before and after its migration.
+- Read token and connection rows with a column list that tolerates the old schema (or `select *`); naming a column the migration has not added yet rejects every token.
+- Fill new columns by default or trigger, not only from the new code.
+- Redeploy with `--no-verify-jwt` (N-10); a redeploy without it turns the gateway JWT check back on.
+- Ship a server-enforced gate (such as the confirmation gate) after its table and functions exist, and make it fail closed when they are missing.
+- Pipeline order and smoke checks: `deploy.md`.
+
+---
+
+## 11. Does not apply here
 
 - **Cloudflare Bindings**: D1, R2, and KV bindings are specific to Cloudflare Workers.
 - **`workers-oauth-provider`**: Specific to Cloudflare Workers.
