@@ -10,13 +10,14 @@ use-when:
   - adding an access admin screen or a usage log to an existing MCP server
   - requiring a human to confirm sensitive MCP tool calls (money, deletes, publishing) outside the chat
   - making one MCP server republish the tools of another MCP server (aggregator by relay)
+  - exposing a large relayed catalog on demand (tool search plus dispatcher) or as per-profile subsets
 do-not-use-for:
   - a local stdio MCP server or a single-user tool wrapper
   - connecting a client to an existing MCP server
   - auditing the MCP configuration of a client
   - a Cloudflare Worker that is not an MCP server
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
   license: MIT
 ---
 
@@ -100,9 +101,12 @@ Declare the mode in your project configuration before building the permission la
 ## Step 3b - Aggregator (only when asked)
 
 Skip unless the server must republish another MCP server's tools. Then the user decides, in the same
-question as Steps 1 to 3: which origin, relay variant or action-catalog variant, and which host domain
-name carries it. Read `references/aggregator-relay.md` before the schema step. Without an explicit
-request, do not add an origin domain, an external accounts table or a connect tool.
+question as Steps 1 to 3: which origin, relay variant or action-catalog variant, which host domain
+name carries it, and the exposure mode (`full` by default, `selected` or `discovery`; see
+`references/aggregator-discovery.md`, section 2). Read `references/aggregator-relay.md` before the schema
+step. Without an explicit request, do not add an origin domain, an external accounts table or a connect
+tool, and keep `full`. Profiles, a circuit breaker and several origins
+(`references/aggregator-composition.md`) come only when the user shows the need.
 
 ---
 
@@ -123,7 +127,10 @@ Release through the pipeline in `references/deploy.md`: migrations before code, 
 Aggregator (Step 3b only): build it after step 7 and before step 8. Order inside it: origin domain in
 the ceiling, external account tables and encryption, connect flow, pure republish modules, dispatcher,
 then the `tools/list` and `tools/call` wiring. The static tool path must stay unchanged and keep passing
-the existing tests (see `references/aggregator-relay.md`, section 13).
+the existing tests (see `references/aggregator-relay.md`, section 13). A mode other than `full` comes
+last: snapshot `tools/list` in `full` first, then add the exposure choice, the search tool and the
+dispatcher on top of the same call pipeline, and measure the modes before picking one (see
+`references/aggregator-discovery.md`, section 8).
 
 ---
 
@@ -151,7 +158,12 @@ the existing tests (see `references/aggregator-relay.md`, section 13).
 - **N-20** (Aggregator) Every outcome of a relayed call writes exactly one usage-log row with the same fields as a static tool (extends N-14; see `references/aggregator-relay.md`, section 8.6).
 - **N-21** Every entry point that runs tools (MCP endpoint, REST side doors, chat bots, queue consumers) goes through one preflight and one call pipeline: per-call access re-check, kill switch, rate limit, effective scope as token ∩ current ceiling, confirmation gate, log row (see `references/permissions.md`, sections 5 and 11).
 
-N-15 to N-20 apply only when Step 3b is chosen.
+- **N-22** (Aggregator) No exposure mode (`full`, `selected`, `discovery`) or profile widens what the person may run: the exposed set is a subset of the allowed set, and mode and profile come from server-side configuration, never from model input (see `references/aggregator-discovery.md`, section 2).
+- **N-23** (Aggregator) A call through the dispatcher (`relay_tool_call`) runs the same pipeline as a direct call of the concrete tool: scope, classification, release, confirmation bound to the concrete tool and argument hash, deadline, and one log row as that tool (see `references/aggregator-discovery.md`, section 5).
+- **N-24** (Aggregator) A published name, a `tool_ref`, a search result, a profile entry or a cached schema is never a credential; every call resolves the reference and reads authority at call time (see `references/aggregator-discovery.md`, section 6).
+- **N-25** (Aggregator) A catalog change, a reclassification, a rename or an origin outage never relaxes permissions, releases or isolation between people and tenants; a composed catalog is never served across identities (see `references/aggregator-composition.md`, sections 2 to 4).
+
+N-15 to N-20 and N-22 to N-25 apply only when Step 3b is chosen.
 
 ---
 
@@ -189,6 +201,8 @@ Judgment calls, not defaults: propose them to the owner, apply when they fit.
 | `references/deploy.md` | Pipeline order, smoke checks, expansion-only migrations, credentials and bootstrap |
 | `references/lessons.md` | Production incidents, root cause analysis, anti-patterns, fixes |
 | `references/aggregator-relay.md` | Republishing another MCP's tools by relay: prefixing, classification, destructive release, per-person OAuth to the origin, token refresh, timeouts, error translation, attachments, action-catalog variant |
+| `references/aggregator-discovery.md` | Exposure modes `full`/`selected`/`discovery`, tool search versus data search, `relay_tools_search`, `relay_tool_call` dispatcher, `tool_ref`, confirmation through the dispatcher, measuring the modes |
+| `references/aggregator-composition.md` | Profiles as virtual catalogs, three cache layers, per-origin circuit breaker, naming registry and aliases, several origins, resources and prompts |
 
 ---
 
@@ -200,6 +214,8 @@ Judgment calls, not defaults: propose them to the owner, apply when they fit.
 | `templates/js/usage-log.mjs` | Argument redaction, result summarizer, log builder | Sensitive key words list |
 | `templates/js/tool-contract.mjs` | defineTool, scopeMap, toListEntry, cutNotice, pending output shape | Tool definitions, input schemas, sensitivity per write tool |
 | `templates/js/confirmation.mjs` | Canonical JSON, argument hash, class per call, pending result, gate | Class map, conditional classes, injected consume/create |
+| `templates/js/aggregator-discovery.mjs` | Exposure choice, `tool_ref` format, registry with collision skip, tokenizer, deterministic ranking with truncation notice | Score weights, stop words, result cap |
+| `templates/js/aggregator-policy.mjs` | Dispatcher bridge into the existing pipeline, dispatcher pending text, per-origin circuit breaker | Injected `runPipeline` and `refuse`, breaker threshold and cooldown |
 | `templates/js/proxy-routes.mjs` | Closed routing table, header filtering | Upstream target URLs |
 | `templates/sql/mcp_core.sql` | Postgres schema, RLS setup, security definer RPCs | fn_mcp_is_admin() and domain seed rows |
 | `templates/sql/mcp_core.sql` (confirmation block) | `mcp_confirmations`, create/consume/read/decide functions | Class list, windows, second-factor claim check, delegated-session check |
