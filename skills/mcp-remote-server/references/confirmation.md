@@ -1,6 +1,6 @@
 # Mandatory Human Confirmation for Sensitive Tools
 
-This reference specifies a server-enforced confirmation step for sensitive tool calls (N-04). The model can never confirm for the user: the decision happens on a page of the host app, in the user's own browser session, outside the MCP channel. It replaces the old "literal `confirm` field in input" rule, which any model can fill in by itself.
+This reference specifies a server-enforced confirmation step for sensitive tool calls (N-04). In the default variant the model can never confirm for the user: the decision happens on a page of the host app, in the user's own browser session, outside the MCP channel. The owner may instead choose the in-chat variant of section 16, accepting that the "yes" travels through the model. It replaces the old "literal `confirm` field in input" rule, which any model can fill in by itself.
 
 ---
 
@@ -274,3 +274,23 @@ When relayed tools are called through a dispatcher (`relay_tool_call`, `aggregat
 - The pending text tells the model to call the dispatcher again with the same `tool_ref`, the same `arguments` and the `confirmation_id`, because the concrete tool is not in its list.
 - A confirmation created by a direct call is valid through the dispatcher and the reverse, when user, connection, concrete tool and argument hash match.
 - Tests: a sensitive tool reached through the dispatcher returns the pending link and never relays on the first call; a confirmation for tool X does not run tool Y through the dispatcher with the same arguments.
+
+---
+
+## 16. In-Chat Variant (owner's choice)
+
+Where the human confirms is the owner's decision, made with the class list. The page of sections 4 to 9 is the default and the strongest. Some owners find the page a bottleneck for everyday writes and choose to confirm in the chat. That is acceptable only as a server-enforced two-step, never as a field the model fills in one call.
+
+| Step | What happens |
+|---|---|
+| 1 | The first call of a sensitive tool writes nothing. It returns a server-built preview (target, before/after, items) and a `confirmation_id` bound to user, connection, tool and argument hash, with a short expiry (10 minutes) |
+| 2 | The description of every sensitive tool says it needs the user's explicit authorization, and the pending text tells the model to show the preview and ask |
+| 3 | The user answers in the chat. The client's own approval prompt ("allow", "always allow") runs on top when the annotations are right |
+| 4 | The repeat call with the same arguments and the `confirmation_id` executes once. Consume is atomic; a mismatch, reuse or expiry refuses |
+| 5 | The usage log keeps the `confirmation_id` on both rows, so the trail shows what was previewed and what ran |
+
+Rules that still hold: no execution on the first call; preview built by the server, never by the model; same pipeline for every door (section 14); one map of classes; the parity test.
+
+What the owner accepts, and must record: the "yes" reaches the server through the model, so a model that misreads the user or follows an instruction planted in a document can confirm by itself. Mitigations: keep the annotations exact (`readOnlyHint: false` and `destructiveHint` on every write, `openWorldHint: true` on tools that email or reach outside), because clients decide when to prompt from them and a write marked read-only runs without a prompt; keep notifying tools silent by default; keep the page for the few actions the owner still wants out of the chat, if any.
+
+The two variants can coexist per class (for example chat for B, page for A). Store the variant in the class map, not in code branches per tool.
