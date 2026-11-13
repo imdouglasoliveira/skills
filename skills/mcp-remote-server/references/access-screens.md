@@ -54,6 +54,7 @@ During the OAuth 2.1 authorization code flow, users approve or reject access req
 - Consent labels must match human-friendly descriptions documented in the integration guide.
 - Group requested scopes by level. Clients usually ask for read only, so add an unchecked "optional write" group built from the user's ceiling.
 - On submit, drop any scope outside the ceiling (a forged form field must not widen the grant); "nothing granted" is a denial.
+- When the app has a second factor, the consent requires it once per new connection, and the function that records the decision checks it too (for example the session's assurance level), not only the screen. An existing connection never asks again; idle expiry is what sends people back through consent. The same applies to the admin function that writes ceilings.
 - Make approval idempotent: a per-request completion mark set in the same redirect means a repeated POST (back button, double submit) shows a "done" page and issues no second code or grant. Denial is not marked.
 - Render the page on the server with a strict CSP and no script. Do not set `form-action`: it breaks the redirect to loopback clients. Show a client logo only for a verified client identity; label the others unverified.
 - Send the issuer parameter on both the approve and the deny redirect.
