@@ -69,7 +69,7 @@ Write operations must follow predictable state guarantees:
 
 ## 5. Sensitive Operations (N-04)
 
-Sensitive tools (class A or B in `confirmation.md`) do not take a `confirm` parameter. Their first call returns `status: "confirmation_pending"` with a link and a summary and executes nothing; the same call repeated after the user confirms on the host-app page executes once.
+Sensitive tools (class A or B in `confirmation.md`) do not take a `confirm` parameter. Their first call returns `status: "confirmation_pending"` with a summary (and a link, in the page variant) and executes nothing; the same call repeated after the user confirms (on the host-app page, or in the chat in the variant of `confirmation.md`, section 16) executes once.
 
 For these tools:
 - `tools/list` adds an optional `confirmation_id` (uuid) to `inputSchema`, forces `destructiveHint: true`, and publishes `outputSchema` as `anyOf: [<tool output>, <pending output>]`.
@@ -160,6 +160,8 @@ Binary input never travels through tool arguments, except small payloads under a
 - The follow-up tool takes the `path`, never the file.
 - The description lists the steps. Build the public upload URL from the public base URL when the platform URL sits behind a proxy.
 - Signed URLs are short lived and never written to the usage log (see `usage-log.md`, section 3).
+- Upload links expire in minutes (15 is enough for a copy-paste command), not hours.
+- Stored files stay private. The record keeps the path; screens and tools create a short-lived signed read link when they show the file. A permanent public URL saved in a record opens the file for anyone who ever sees the link, logged in or not.
 
 ---
 
@@ -186,3 +188,14 @@ A tool that spends money or quota (LLM, OCR, SMS, paid API) calls one budget hel
 ## 15. Entry Points Other Than the MCP Endpoint
 
 REST side doors, chat bots and queue consumers that run tools go through the same preflight and call pipeline as `tools/call` (N-21, `permissions.md`, section 5). A side door that cannot enforce a PAT restriction refuses restricted PATs. Sensitive tools keep the confirmation gate on every door (`confirmation.md`, section 14).
+
+---
+
+## 16. Rate Limits That Brake
+
+A limit exists to stop a runaway loop, not to refuse a legitimate batch (a hundred backdated records created on purpose).
+- Count atomically (a counter row or a platform binding), not by counting log rows under concurrency.
+- Set the cap well above real use per connection; measure before tightening.
+- On the cap, return a tool result with `isError: true`, a `retry_after` in seconds and the text "Wait N seconds and continue", plus `Retry-After` when the refusal is HTTP. Models wait and resume; nothing is lost.
+- Keep a separate, lower counter for calls that notify third parties (only calls with notification on). A silent batch never touches it.
+- For large legitimate batches, offer a bulk tool with a preview (section 10) instead of raising the cap.
