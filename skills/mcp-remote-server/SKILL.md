@@ -17,7 +17,7 @@ do-not-use-for:
   - auditing the MCP configuration of a client
   - a Cloudflare Worker that is not an MCP server
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
   license: MIT
 ---
 
@@ -44,8 +44,8 @@ ceiling mode that it does not state, ask the user in one message, listing the op
 with one line on the trade-off, and stop. Do not create a file, a migration or a template copy until the
 three answers are in. A safe-looking default (such as `deny`) is still a decision the user did not make.
 
-The sensitive-tool list (class A, B, C) and the second-factor policy (code window per class, what happens to
-users without a factor) are also the owner's decisions. Propose the recommended list from
+The sensitive-tool list (class A, B, C), where the user confirms (host-app page or chat) and the second-factor
+policy (code window per class, what happens to users without a factor) are also the owner's decisions. Propose the recommended list from
 `references/confirmation.md`, mark it reviewable, and do not treat it as blocking.
 
 ---
@@ -139,7 +139,7 @@ dispatcher on top of the same call pipeline, and measure the modes before pickin
 - **N-01** Auth, `Origin` header check and kill switch run before the request body is parsed (see `references/protocol.md`).
 - **N-02** Tool scope is declared in the tool definition; the scope map is derived, never hand-written; a parity test locks the two in sync (see `references/tool-contract.md`).
 - **N-03** A truncated list always includes a `notice` with `cut_at` and the name of the full-list tool; silent truncation is forbidden (see `references/tool-contract.md`).
-- **N-04** A sensitive tool (every write the product owner classifies as A or B) never executes on the first call: it returns a confirmation link and a preview. It runs exactly once, only after the owning user confirms on a host-app page with a recent second factor, and the confirmation is bound to the user, connection, tool and argument hash. The client's "always allow" never replaces it; read tools never need it (see `references/confirmation.md`).
+- **N-04** A sensitive tool (every write the product owner classifies as A or B) never executes on the first call: it returns a preview and a confirmation id. It runs exactly once, only after the owning user confirms, and the confirmation is bound to the user, connection, tool and argument hash. Where the user confirms is the owner's choice: a host-app page with a recent second factor (default) or the chat as a server-enforced two-step (`references/confirmation.md`, section 16, risk recorded). The client's "always allow" never replaces it; read tools never need it (see `references/confirmation.md`).
 - **N-05** The `resource` parameter is checked byte-for-byte (no trailing slash) in both `/authorize` and `/token`; the audience is stored and re-validated on every use (see `references/auth-modes.md`).
 - **N-06** `/token` checks the client record before the authorization code; `invalid_client` 401 is only for a client that does not exist; a database failure returns 500 `server_error` (see `references/auth-modes.md`).
 - **N-07** Permissions have three layers: tenant kill switch, per-user domain ceiling, per-token scope (see `references/permissions.md`).
@@ -171,7 +171,9 @@ N-15 to N-20 and N-22 to N-25 apply only when Step 3b is chosen.
 
 Judgment calls, not defaults: propose them to the owner, apply when they fit.
 
-- **Idle connection expiry** - revoke connections unused for N days (7 is a good start) by a daily job (see `references/auth-modes.md`, section 10).
+- **Idle connection expiry** - revoke connections unused for N days (7 to 14, a per-tenant setting) by a daily job (see `references/auth-modes.md`, section 10).
+- **Rate limits that brake** - an atomic cap well above real use that answers "wait N seconds", plus a lower counter for calls that notify third parties (see `references/tool-contract.md`, section 16).
+- **Private files** - stored attachments keep a path; screens and tools sign a short read link when showing them (see `references/tool-contract.md`, section 12).
 - **Server prompts** - ship `prompts` as scripted playbooks for tasks models keep getting wrong (see `references/protocol.md`, section 7).
 - **Test-data filter** - when the app has test records, every list or summary tool takes an `environment` enum defaulting to production (see `references/tool-contract.md`, section 9).
 - **Silent by default** - a tool that can notify third parties stays silent unless the caller passes an explicit flag (see `references/tool-contract.md`, section 4).
@@ -187,8 +189,8 @@ Judgment calls, not defaults: propose them to the owner, apply when they fit.
 | Reference | When to read |
 |---|---|
 | `references/protocol.md` | Protocol specification `2026-07-28`, backwards compatibility, error codes, request deadline, prompts |
-| `references/tool-contract.md` | Tool schema definitions, scope mapping, output structures, cut notice pagination, egress, uploads, output shaping, metered tools, idempotency |
-| `references/confirmation.md` | Mandatory human confirmation for sensitive tools: classes, pending-action record, flow, previews, second factor, replay protection, tests |
+| `references/tool-contract.md` | Tool schema definitions, scope mapping, output structures, cut notice pagination, egress, uploads, output shaping, metered tools, idempotency, rate limits that brake |
+| `references/confirmation.md` | Mandatory human confirmation for sensitive tools: classes, pending-action record, flow, previews, second factor, replay protection, tests, in-chat variant |
 | `references/auth-modes.md` | Four auth modes, selection matrix, CIMD/DCR, PKCE, error semantics, loopback, PAT checklist, idle expiry, second authorization at an origin |
 | `references/permissions.md` | Three-layer permissions, ceiling modes deny/allow, exact scope matching, effectiveScopes, entry points, RLS vs helper, origin domains, role gates, per-call access re-check |
 | `references/runtime-supabase.md` | Edge Functions, `verify_jwt = false`, user session, dual audience, deploy order |

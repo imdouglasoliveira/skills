@@ -48,6 +48,7 @@ The `/token` endpoint must validate the client record before attempting to look 
 ## 6. Token Lifecycle: Rotation and Hashes
 
 - **Refresh token rotation**: Issuing a new access token via refresh token must invalidate the used refresh token and issue a new one. If an invalidated refresh token is presented, the entire family of tokens associated with that session must be revoked immediately.
+- **Clients with several sessions**: a desktop app, a CLI and parallel agents of the same client can share one refresh token. With strict single use, the second session presents a refresh the first already rotated and the family is revoked: people get disconnected every hour. Choose on purpose: a short grace window (seconds) in which the previous refresh still answers, with family revocation only after it; or, as an owner decision with the risk written down, keep the used refresh valid until it expires (a stolen refresh then lives until expiry). Either way keep a bounded refresh lifetime and idle expiry (section 10) as the backstop.
 - **Hash storage**: Authorization codes and tokens must never be persisted in plain text; store only cryptographic hashes (SHA-256) in the database.
 
 ---
@@ -83,7 +84,7 @@ For native and CLI clients using loopback addresses (such as `http://127.0.0.1` 
 
 ## 10. Idle Connection Expiry (recommended)
 
-A refresh token keeps a forgotten connection alive forever: a client left plugged in for months still holds a valid grant. Expire connections that nobody uses. This is a recommendation, not a default; the owner picks the window (7 days is a good start: a weekly user never notices, an abandoned client loses access).
+A refresh token keeps a forgotten connection alive forever: a client left plugged in for months still holds a valid grant. Expire connections that nobody uses. This is a recommendation, not a default; the owner picks the window (7 to 14 days: a weekly user never notices, someone back from a trip still has access, an abandoned client loses access). Make the window a per-tenant setting, not a constant.
 
 | Decision | Recommendation |
 |---|---|
